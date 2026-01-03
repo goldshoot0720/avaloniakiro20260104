@@ -66,45 +66,79 @@ dotnet restore
 # 建置專案
 dotnet build
 
+# 執行測試
+dotnet test
+
 # 執行應用程式
 dotnet run --project avaloniakiro20260104
 ```
 
-### 發布應用程式
+### 快速多平台建置
+我們提供了便利的建置腳本來一次建置所有支援的平台：
+
+**Linux/macOS:**
+```bash
+./scripts/build-all-platforms.sh
+```
+
+**Windows:**
+```cmd
+scripts\build-all-platforms.bat
+```
+
+### 手動發布應用程式
 ```bash
 # Windows x64
-dotnet publish -c Release -r win-x64 --self-contained
+dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+
+# Windows ARM64
+dotnet publish -c Release -r win-arm64 --self-contained -p:PublishSingleFile=true
 
 # macOS x64
-dotnet publish -c Release -r osx-x64 --self-contained
+dotnet publish -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 
 # macOS ARM64 (Apple Silicon)
-dotnet publish -c Release -r osx-arm64 --self-contained
+dotnet publish -c Release -r osx-arm64 --self-contained -p:PublishSingleFile=true
 
 # Linux x64
-dotnet publish -c Release -r linux-x64 --self-contained
+dotnet publish -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# Linux ARM64
+dotnet publish -c Release -r linux-arm64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 專案結構
 
 ```
 avaloniakiro20260104/
-├── Assets/                 # 資源檔案
-├── Models/                 # 資料模型
-│   ├── FoodItem.cs        # 食品項目模型
-│   ├── Subscription.cs    # 訂閱模型
-│   └── VideoContent.cs    # 影片內容模型
-├── ViewModels/            # 視圖模型
-│   ├── MainWindowViewModel.cs      # 主視窗視圖模型
-│   ├── StringEqualsConverter.cs    # 字串比較轉換器
-│   └── ViewModelBase.cs           # 視圖模型基底類別
-├── Views/                 # 視圖
-│   ├── MainWindow.axaml   # 主視窗 XAML
-│   └── MainWindow.axaml.cs # 主視窗程式碼
-├── App.axaml             # 應用程式 XAML
-├── App.axaml.cs          # 應用程式程式碼
-├── Program.cs            # 程式進入點
-└── ViewLocator.cs        # 視圖定位器
+├── .github/
+│   └── workflows/
+│       └── build-and-release.yml    # GitHub Actions CI/CD
+├── avaloniakiro20260104/            # 主應用程式
+│   ├── Assets/                      # 資源檔案
+│   ├── Models/                      # 資料模型
+│   │   ├── FoodItem.cs             # 食品項目模型
+│   │   ├── Subscription.cs         # 訂閱模型
+│   │   └── VideoContent.cs         # 影片內容模型
+│   ├── ViewModels/                  # 視圖模型
+│   │   ├── MainWindowViewModel.cs  # 主視窗視圖模型
+│   │   ├── StringEqualsConverter.cs # 字串比較轉換器
+│   │   └── ViewModelBase.cs        # 視圖模型基底類別
+│   ├── Views/                       # 視圖
+│   │   ├── MainWindow.axaml        # 主視窗 XAML
+│   │   └── MainWindow.axaml.cs     # 主視窗程式碼
+│   ├── App.axaml                   # 應用程式 XAML
+│   ├── App.axaml.cs                # 應用程式程式碼
+│   ├── Program.cs                  # 程式進入點
+│   └── ViewLocator.cs              # 視圖定位器
+├── avaloniakiro20260104.Tests/      # 測試專案
+│   └── UnitTest1.cs                # 單元測試
+├── scripts/                         # 建置腳本
+│   ├── build-all-platforms.sh      # Linux/macOS 建置腳本
+│   └── build-all-platforms.bat     # Windows 建置腳本
+├── CHANGELOG.md                     # 更新日誌
+├── LICENSE                          # MIT 授權條款
+└── README.md                        # 專案說明
 ```
 
 ## 功能截圖

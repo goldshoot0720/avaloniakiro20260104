@@ -1,0 +1,103 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            runtime: linux-x64
+            artifact-name: avaloniakiro-linux-x64
+          - os: windows-latest
+            runtime: win-x64
+            artifact-name: avaloniakiro-windows-x64
+          - os: macos-latest
+            runtime: osx-x64
+            artifact-name: avaloniakiro-macos-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --configuration Release
+
+    - name: Publish
+      run: dotnet publish avaloniakiro20260104/avaloniakiro20260104.csproj -c Release -r ${{ matrix.runtime }} --self-contained -o publish/${{ matrix.runtime }}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact-name }}
+        path: publish/${{ matrix.runtime }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Create Release Archives
+      run: |
+        cd avaloniakiro-linux-x64 && tar -czf ../avaloniakiro-linux-x64.tar.gz . && cd ..
+        cd avaloniakiro-windows-x64 && zip -r ../avaloniakiro-windows-x64.zip . && cd ..
+        cd avaloniakiro-macos-x64 && tar -czf ../avaloniakiro-macos-x64.tar.gz . && cd ..
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          avaloniakiro-linux-x64.tar.gz
+          avaloniakiro-windows-x64.zip
+          avaloniakiro-macos-x64.tar.gz
+        body: |
+          ## 🎉 鋒兄Next資訊管理系統 ${{ github.ref_name }}
+
+          ### 📦 下載
+          - **Windows x64**: avaloniakiro-windows-x64.zip
+          - **macOS x64**: avaloniakiro-macos-x64.tar.gz  
+          - **Linux x64**: avaloniakiro-linux-x64.tar.gz
+
+          ### 🚀 安裝說明
+          1. 下載對應平台的壓縮檔
+          2. 解壓縮到任意目錄
+          3. 執行 `avaloniakiro20260104` (Linux/macOS) 或 `avaloniakiro20260104.exe` (Windows)
+
+          ### ✨ 功能特色
+          - 📊 儀表板統計
+          - 🍎 食品管理
+          - 📋 訂閱管理  
+          - 🎬 影片介紹
+          - 🎵 音樂歌詞
+          - ℹ️ 關於我們
+
+          完整更新日誌請參考 [CHANGELOG.md](https://github.com/goldshoot0720/avaloniakiro20260104/blob/main/CHANGELOG.md)
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

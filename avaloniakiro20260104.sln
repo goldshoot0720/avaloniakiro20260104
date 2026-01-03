@@ -1,6 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "avaloniakiro20260104", "avaloniakiro20260104\avaloniakiro20260104.csproj", "{7C083267-3184-4A5F-A5CB-BACF38AD42F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "avaloniakiro20260104.Tests", "avaloniakiro20260104.Tests\avaloniakiro20260104.Tests.csproj", "{651EC98B-53C9-4596-A141-8066E9D4963A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +15,9 @@ Global
 		{7C083267-3184-4A5F-A5CB-BACF38AD42F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C083267-3184-4A5F-A5CB-BACF38AD42F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C083267-3184-4A5F-A5CB-BACF38AD42F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{651EC98B-53C9-4596-A141-8066E9D4963A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{651EC98B-53C9-4596-A141-8066E9D4963A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{651EC98B-53C9-4596-A141-8066E9D4963A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{651EC98B-53C9-4596-A141-8066E9D4963A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
