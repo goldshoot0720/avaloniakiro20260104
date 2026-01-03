@@ -1,0 +1,239 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:avaloniakiro20260104.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="avaloniakiro20260104.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="鋒兄Next資訊管理"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 側邊選單 -->
+        <Border Grid.Column="0" Background="#2563EB" Padding="20">
+            <StackPanel>
+                <!-- Logo 區域 -->
+                <Border Background="#1D4ED8" CornerRadius="10" Padding="15" Margin="0,0,0,30">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Background="White" CornerRadius="8" Width="40" Height="40" Margin="0,0,10,0">
+                            <TextBlock Text="鋒" FontSize="18" FontWeight="Bold" 
+                                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                                     Foreground="#2563EB"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="鋒兄Next資訊管" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                            <TextBlock Text="理" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 選單項目 -->
+                <StackPanel Spacing="5">
+                    <Button Content="📊 儀表板" 
+                            Command="{Binding SelectMenuItemCommand}" 
+                            CommandParameter="儀表板"
+                            Classes="menuButton"/>
+                    
+                    <Button Content="🍎 食品管理" 
+                            Command="{Binding SelectMenuItemCommand}" 
+                            CommandParameter="食品管理"
+                            Classes="menuButton"/>
+                    
+                    <Button Content="📋 訂閱管理" 
+                            Command="{Binding SelectMenuItemCommand}" 
+                            CommandParameter="訂閱管理"
+                            Classes="menuButton"/>
+                    
+                    <Button Content="🎬 影片介紹" 
+                            Command="{Binding SelectMenuItemCommand}" 
+                            CommandParameter="影片介紹"
+                            Classes="menuButton"/>
+                    
+                    <Button Content="🎵 鋒兄音樂歌詞" 
+                            Command="{Binding SelectMenuItemCommand}" 
+                            CommandParameter="音樂歌詞"
+                            Classes="menuButton"/>
+                    
+                    <Button Content="ℹ️ 關於我們" 
+                            Command="{Binding SelectMenuItemCommand}" 
+                            CommandParameter="關於我們"
+                            Classes="menuButton"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- 主要內容區域 -->
+        <ScrollViewer Grid.Column="1" Background="#F8FAFC">
+            <StackPanel Margin="30">
+                <!-- 動態內容根據選擇的選單項目顯示 -->
+                <TextBlock Text="{Binding SelectedMenuItem}" FontSize="28" FontWeight="Bold" Margin="0,0,0,20"/>
+                
+                <!-- 儀表板內容 -->
+                <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=儀表板}">
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" Margin="0,0,0,30">
+                        <!-- 統計卡片 -->
+                        <Border Grid.Column="0" Background="#3B82F6" CornerRadius="12" Padding="20" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="📦" FontSize="24" Margin="0,0,0,10"/>
+                                <TextBlock Text="{Binding TotalFoodItems}" FontSize="32" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="食品項目" FontSize="14" Foreground="White" Opacity="0.9"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Grid.Column="1" Background="#10B981" CornerRadius="12" Padding="20" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="📋" FontSize="24" Margin="0,0,0,10"/>
+                                <TextBlock Text="{Binding TotalSubscriptions}" FontSize="32" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="訂閱服務" FontSize="14" Foreground="White" Opacity="0.9"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Grid.Column="2" Background="#F59E0B" CornerRadius="12" Padding="20" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="⚠️" FontSize="24" Margin="0,0,0,10"/>
+                                <TextBlock Text="{Binding ExpiringFoodItems}" FontSize="32" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="需要注意" FontSize="14" Foreground="White" Opacity="0.9"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Grid.Column="3" Background="#8B5CF6" CornerRadius="12" Padding="20" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="💰" FontSize="24" Margin="0,0,0,10"/>
+                                <TextBlock Text="{Binding MonthlyTotal, StringFormat=NT$ {0:N0}}" FontSize="32" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="月費總計" FontSize="14" Foreground="White" Opacity="0.9"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+
+                <!-- 食品管理內容 -->
+                <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=食品管理}">
+                    <TextBlock Text="{Binding TotalFoodItems, StringFormat=共 {0} 項食品}" FontSize="16" Foreground="#6B7280" Margin="0,0,0,20"/>
+                    
+                    <ListBox ItemsSource="{Binding FoodItems}" Background="White" CornerRadius="12" Padding="10">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="White" CornerRadius="8" Padding="15" Margin="0,5">
+                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding ExpiryDate, StringFormat=yyyy-MM-dd}" VerticalAlignment="Center" Margin="10,0"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Quantity}" VerticalAlignment="Center" Margin="10,0"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding Status}" VerticalAlignment="Center" Margin="10,0"/>
+                                        <Button Grid.Column="4" Content="編輯" Background="#3B82F6" Foreground="White" Padding="8,4" CornerRadius="4"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- 訂閱管理內容 -->
+                <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=訂閱管理}">
+                    <TextBlock Text="{Binding MonthlyTotal, StringFormat=總計 NT$ {0:N0}}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6" Margin="0,0,0,20"/>
+                    
+                    <ListBox ItemsSource="{Binding Subscriptions}" Background="White" CornerRadius="12" Padding="10">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="White" CornerRadius="8" Padding="15" Margin="0,5">
+                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding NextPaymentDate, StringFormat=yyyy-MM-dd}" VerticalAlignment="Center" Margin="10,0"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Amount, StringFormat=NT$ {0}}" VerticalAlignment="Center" Margin="10,0"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding Status}" VerticalAlignment="Center" Margin="10,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- 影片介紹內容 -->
+                <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=影片介紹}">
+                    <TextBlock Text="觀看精彩影片內容，支援本地或線上影片檔案使用" FontSize="14" Foreground="#6B7280" Margin="0,0,0,30"/>
+                    
+                    <ItemsControl ItemsSource="{Binding Videos}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="2"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="12" Margin="10" Height="200">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                            <GradientStop Color="#3B82F6" Offset="0"/>
+                                            <GradientStop Color="#8B5CF6" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <TextBlock Text="▶" FontSize="48" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                                        <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Description}" FontSize="12" Foreground="White" Opacity="0.8" HorizontalAlignment="Center" Margin="10,5"/>
+                                        <TextBlock Text="{Binding Duration}" FontSize="14" Foreground="White" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- 其他選單項目的佔位符 -->
+                <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=音樂歌詞}">
+                    <TextBlock Text="收藏和管理您喜愛的歌曲歌詞" FontSize="14" Foreground="#6B7280" Margin="0,0,0,30"/>
+                    <Border Background="White" CornerRadius="12" Padding="40" HorizontalAlignment="Center">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="🎵" FontSize="64" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                            <TextBlock Text="選擇一首歌曲" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=關於我們}">
+                    <Border Background="White" CornerRadius="12" Padding="30">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Border Background="#8B5CF6" CornerRadius="12" Width="60" Height="60" Margin="0,0,0,20">
+                                <TextBlock Text="鋒途" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="鋒兄途哥公開資訊" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                            <TextBlock Text="我們是專業的公開關係，致力於為管理提供優質的公開服務和智能管理解決方案。" 
+                                     FontSize="14" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                            <TextBlock Text="鋒兄Next資訊管理 v1.0.0 • Next.js + TypeScript • Made with ❤️ in Taiwan" 
+                                     FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+
+    <Window.Styles>
+        <Style Selector="Button.menuButton">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        
+        <Style Selector="Button.menuButton:pointerover">
+            <Setter Property="Background" Value="#1D4ED8"/>
+        </Style>
+    </Window.Styles>
+
+</Window>
