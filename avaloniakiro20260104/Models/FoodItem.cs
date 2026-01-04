@@ -1,70 +1,55 @@
 using System;
-using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace avaloniakiro20260104.Models;
 
 public partial class FoodItem : ObservableObject
 {
+    /// <summary>
+    /// 帳戶id uuid自動產生
+    /// </summary>
     [ObservableProperty]
-    [JsonPropertyName("id")]
-    private string _id = string.Empty;
+    private string _id = Guid.NewGuid().ToString();
 
+    /// <summary>
+    /// 食品名稱
+    /// </summary>
     [ObservableProperty]
-    [JsonPropertyName("name")]
     private string _name = string.Empty;
 
+    /// <summary>
+    /// 數量
+    /// </summary>
     [ObservableProperty]
-    [JsonPropertyName("to_date")]
-    private DateTime _expiryDate = DateTime.Now.AddDays(7);
+    private int _amount = 1;
 
+    /// <summary>
+    /// 圖片網址
+    /// </summary>
     [ObservableProperty]
-    [JsonPropertyName("amount")]
-    private int _quantity = 1;
+    private string _photo = string.Empty;
 
+    /// <summary>
+    /// 圖片雜湊值
+    /// </summary>
     [ObservableProperty]
-    [JsonPropertyName("photo")]
-    private string _imageUrl = string.Empty;
+    private string? _photoHash;
 
+    /// <summary>
+    /// 價錢
+    /// </summary>
     [ObservableProperty]
-    [JsonPropertyName("shop")]
-    private string? _shop;
-
-    [ObservableProperty]
-    [JsonPropertyName("price")]
     private decimal? _price;
 
-    // 本地屬性（不從 API 映射）
-    [JsonIgnore]
-    public string Category { get; set; } = "其他";
+    /// <summary>
+    /// 商店
+    /// </summary>
+    [ObservableProperty]
+    private string? _shop;
 
-    [JsonIgnore]
-    public string Location { get; set; } = "冰箱";
-
-    [JsonIgnore]
-    public string Notes { get; set; } = string.Empty;
-
-    [JsonIgnore]
-    public DateTime PurchaseDate { get; set; } = DateTime.Now;
-
-    [JsonIgnore]
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-    [JsonIgnore]
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
-
-    [JsonIgnore]
-    public string Status => ExpiryDate < DateTime.Now ? "已過期" : 
-                           ExpiryDate <= DateTime.Now.AddDays(7) ? "即將過期" : "正常";
-
-    [JsonIgnore]
-    public string StatusColor => Status switch
-    {
-        "已過期" => "#EF4444",
-        "即將過期" => "#F59E0B",
-        _ => "#10B981"
-    };
-
-    [JsonIgnore]
-    public int DaysUntilExpiry => (ExpiryDate - DateTime.Now).Days;
+    /// <summary>
+    /// 有效期限
+    /// </summary>
+    [ObservableProperty]
+    private DateTime _toDate = DateTime.Now.AddDays(7);
 }

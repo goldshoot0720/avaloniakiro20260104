@@ -23,10 +23,7 @@ public partial class SubscriptionDialog : Window
     private void InitializeDefaults()
     {
         NextPaymentDatePicker.SelectedDate = DateTime.Now.AddMonths(1);
-        StartDatePicker.SelectedDate = DateTime.Now;
-        BillingCycleComboBox.SelectedIndex = 0; // 每月
-        CategoryComboBox.SelectedIndex = 0; // 娛樂
-        PaymentMethodComboBox.SelectedIndex = 0; // 信用卡
+        CategoryComboBox.SelectedIndex = 0; // 娛樂（僅本地）
         
         SaveButton.Click += SaveButton_Click;
         CancelButton.Click += CancelButton_Click;
@@ -35,39 +32,21 @@ public partial class SubscriptionDialog : Window
     private void LoadSubscription(Subscription subscription)
     {
         NameTextBox.Text = subscription.Name;
-        AmountNumeric.Value = (decimal)subscription.Amount;
+        AccountTextBox.Text = subscription.Account;
+        AmountNumeric.Value = subscription.Amount;
         NextPaymentDatePicker.SelectedDate = subscription.NextPaymentDate;
-        StartDatePicker.SelectedDate = subscription.StartDate;
         UrlTextBox.Text = subscription.Url;
         DescriptionTextBox.Text = subscription.Description;
+        
+        // 本地屬性（不同步到後端）
         IsActiveCheckBox.IsChecked = subscription.IsActive;
         
-        // 設定計費週期
-        for (int i = 0; i < BillingCycleComboBox.ItemCount; i++)
-        {
-            if (((ComboBoxItem)BillingCycleComboBox.Items[i]!).Tag?.ToString() == subscription.BillingCycle.ToString())
-            {
-                BillingCycleComboBox.SelectedIndex = i;
-                break;
-            }
-        }
-        
-        // 設定分類
+        // 設定分類（僅本地）
         for (int i = 0; i < CategoryComboBox.ItemCount; i++)
         {
             if (((ComboBoxItem)CategoryComboBox.Items[i]!).Content?.ToString() == subscription.Category)
             {
                 CategoryComboBox.SelectedIndex = i;
-                break;
-            }
-        }
-        
-        // 設定付款方式
-        for (int i = 0; i < PaymentMethodComboBox.ItemCount; i++)
-        {
-            if (((ComboBoxItem)PaymentMethodComboBox.Items[i]!).Content?.ToString() == subscription.PaymentMethod)
-            {
-                PaymentMethodComboBox.SelectedIndex = i;
                 break;
             }
         }
@@ -84,15 +63,18 @@ public partial class SubscriptionDialog : Window
         Result = new Subscription
         {
             Name = NameTextBox.Text,
-            Amount = (decimal)AmountNumeric.Value,
+            Account = AccountTextBox.Text,
+            Amount = AmountNumeric.Value ?? 0,
             NextPaymentDate = NextPaymentDatePicker.SelectedDate?.DateTime ?? DateTime.Now.AddMonths(1),
-            StartDate = StartDatePicker.SelectedDate?.DateTime ?? DateTime.Now,
-            BillingCycle = int.Parse(((ComboBoxItem)BillingCycleComboBox.SelectedItem!)?.Tag?.ToString() ?? "1"),
-            Category = ((ComboBoxItem)CategoryComboBox.SelectedItem!)?.Content?.ToString() ?? "娛樂",
-            PaymentMethod = ((ComboBoxItem)PaymentMethodComboBox.SelectedItem!)?.Content?.ToString() ?? "信用卡",
             Url = UrlTextBox.Text ?? string.Empty,
             Description = DescriptionTextBox.Text ?? string.Empty,
-            IsActive = IsActiveCheckBox.IsChecked ?? true
+            
+            // 本地屬性（不同步到後端）
+            Category = ((ComboBoxItem)CategoryComboBox.SelectedItem!)?.Content?.ToString() ?? "娛樂",
+            IsActive = IsActiveCheckBox.IsChecked ?? true,
+            PaymentMethod = "信用卡", // 預設值
+            BillingCycle = 1, // 預設每月
+            StartDate = DateTime.Now // 預設今天
         };
         
         Close(Result);

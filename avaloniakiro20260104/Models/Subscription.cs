@@ -7,34 +7,27 @@ namespace avaloniakiro20260104.Models;
 public partial class Subscription : ObservableObject
 {
     [ObservableProperty]
-    [JsonPropertyName("id")]
     private string _id = string.Empty;
 
     [ObservableProperty]
-    [JsonPropertyName("name")]
     private string _name = string.Empty;
 
     [ObservableProperty]
-    [JsonPropertyName("nextdate")]
     private DateTime _nextPaymentDate = DateTime.Now.AddMonths(1);
 
     [ObservableProperty]
-    [JsonPropertyName("price")]
-    private decimal _amount;
+    private decimal _amount = 0;
 
     [ObservableProperty]
-    [JsonPropertyName("site")]
     private string _url = string.Empty;
 
     [ObservableProperty]
-    [JsonPropertyName("note")]
     private string? _description;
 
     [ObservableProperty]
-    [JsonPropertyName("account")]
     private string? _account;
 
-    // 本地屬性（不從 API 映射）
+    // 本地屬性（不同步到後端）
     [JsonIgnore]
     public string Category { get; set; } = "娛樂";
 

@@ -6,10 +6,22 @@ namespace avaloniakiro20260104.Tests;
 public class MainWindowViewModelTests
 {
     [Fact]
-    public void MainWindowViewModel_InitializesWithSampleData()
+    public async Task MainWindowViewModel_InitializesWithSampleData()
     {
         // Arrange & Act
         var viewModel = new MainWindowViewModel();
+        
+        // Wait for data loading to complete
+        await Task.Delay(100); // Give some time for async loading
+        
+        // If still loading, wait a bit more
+        var maxWait = 5000; // 5 seconds max
+        var waited = 0;
+        while (viewModel.IsLoading && waited < maxWait)
+        {
+            await Task.Delay(100);
+            waited += 100;
+        }
 
         // Assert
         Assert.NotEmpty(viewModel.FoodItems);
@@ -19,10 +31,20 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void TotalFoodItems_ReturnsCorrectCount()
+    public async Task TotalFoodItems_ReturnsCorrectCount()
     {
         // Arrange
         var viewModel = new MainWindowViewModel();
+        
+        // Wait for data loading to complete
+        await Task.Delay(100);
+        var maxWait = 5000;
+        var waited = 0;
+        while (viewModel.IsLoading && waited < maxWait)
+        {
+            await Task.Delay(100);
+            waited += 100;
+        }
 
         // Act
         var totalItems = viewModel.TotalFoodItems;
@@ -32,10 +54,20 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void MonthlyTotal_CalculatesCorrectSum()
+    public async Task MonthlyTotal_CalculatesCorrectSum()
     {
         // Arrange
         var viewModel = new MainWindowViewModel();
+        
+        // Wait for data loading to complete
+        await Task.Delay(100);
+        var maxWait = 5000;
+        var waited = 0;
+        while (viewModel.IsLoading && waited < maxWait)
+        {
+            await Task.Delay(100);
+            waited += 100;
+        }
 
         // Act
         var monthlyTotal = viewModel.MonthlyTotal;
@@ -69,7 +101,7 @@ public class FoodItemTests
         var foodItem = new FoodItem
         {
             Name = "Test Food",
-            ExpiryDate = DateTime.Now.AddDays(-1)
+            ToDate = DateTime.Now.AddDays(-1)
         };
 
         // Act
@@ -86,7 +118,7 @@ public class FoodItemTests
         var foodItem = new FoodItem
         {
             Name = "Test Food",
-            ExpiryDate = DateTime.Now.AddDays(3)
+            ToDate = DateTime.Now.AddDays(3)
         };
 
         // Act
@@ -103,7 +135,7 @@ public class FoodItemTests
         var foodItem = new FoodItem
         {
             Name = "Test Food",
-            ExpiryDate = DateTime.Now.AddDays(10)
+            ToDate = DateTime.Now.AddDays(10)
         };
 
         // Act

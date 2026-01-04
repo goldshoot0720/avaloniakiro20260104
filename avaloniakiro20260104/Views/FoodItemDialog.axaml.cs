@@ -22,10 +22,7 @@ public partial class FoodItemDialog : Window
     
     private void InitializeDefaults()
     {
-        ExpiryDatePicker.SelectedDate = DateTime.Now.AddDays(7);
-        PurchaseDatePicker.SelectedDate = DateTime.Now;
-        CategoryComboBox.SelectedIndex = 9; // 其他
-        LocationComboBox.SelectedIndex = 0; // 冰箱
+        ToDatePicker.SelectedDate = DateTime.Now.AddDays(7);
         
         SaveButton.Click += SaveButton_Click;
         CancelButton.Click += CancelButton_Click;
@@ -33,31 +30,13 @@ public partial class FoodItemDialog : Window
     
     private void LoadFoodItem(FoodItem foodItem)
     {
+        // API 支援的欄位
         NameTextBox.Text = foodItem.Name;
-        QuantityNumeric.Value = foodItem.Quantity;
-        ExpiryDatePicker.SelectedDate = foodItem.ExpiryDate;
-        PurchaseDatePicker.SelectedDate = foodItem.PurchaseDate;
-        NotesTextBox.Text = foodItem.Notes;
-        
-        // 設定分類
-        for (int i = 0; i < CategoryComboBox.ItemCount; i++)
-        {
-            if (((ComboBoxItem)CategoryComboBox.Items[i]!).Content?.ToString() == foodItem.Category)
-            {
-                CategoryComboBox.SelectedIndex = i;
-                break;
-            }
-        }
-        
-        // 設定位置
-        for (int i = 0; i < LocationComboBox.ItemCount; i++)
-        {
-            if (((ComboBoxItem)LocationComboBox.Items[i]!).Content?.ToString() == foodItem.Location)
-            {
-                LocationComboBox.SelectedIndex = i;
-                break;
-            }
-        }
+        AmountNumeric.Value = foodItem.Amount;
+        ToDatePicker.SelectedDate = foodItem.ToDate;
+        PhotoTextBox.Text = foodItem.Photo;
+        PriceNumeric.Value = (decimal)(foodItem.Price ?? 0m);
+        ShopTextBox.Text = foodItem.Shop ?? string.Empty;
     }
     
     private void SaveButton_Click(object? sender, RoutedEventArgs e)
@@ -70,13 +49,13 @@ public partial class FoodItemDialog : Window
         
         Result = new FoodItem
         {
+            // API 支援的欄位
             Name = NameTextBox.Text,
-            Quantity = (int)QuantityNumeric.Value,
-            ExpiryDate = ExpiryDatePicker.SelectedDate?.DateTime ?? DateTime.Now.AddDays(7),
-            PurchaseDate = PurchaseDatePicker.SelectedDate?.DateTime ?? DateTime.Now,
-            Category = ((ComboBoxItem)CategoryComboBox.SelectedItem!)?.Content?.ToString() ?? "其他",
-            Location = ((ComboBoxItem)LocationComboBox.SelectedItem!)?.Content?.ToString() ?? "冰箱",
-            Notes = NotesTextBox.Text ?? string.Empty
+            Amount = (int)(AmountNumeric.Value ?? 1),
+            ToDate = ToDatePicker.SelectedDate?.DateTime ?? DateTime.Now.AddDays(7),
+            Photo = PhotoTextBox.Text ?? string.Empty,
+            Price = PriceNumeric.Value > 0 ? (decimal?)PriceNumeric.Value : null,
+            Shop = string.IsNullOrWhiteSpace(ShopTextBox.Text) ? null : ShopTextBox.Text
         };
         
         Close(Result);

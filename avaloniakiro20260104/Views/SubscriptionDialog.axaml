@@ -11,29 +11,33 @@
         <StackPanel Spacing="15">
             <TextBlock Text="訂閱服務資訊" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
             
-            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,20,0,0">
+            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,20,0,0">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="服務名稱:" VerticalAlignment="Center" FontWeight="SemiBold"/>
                 <TextBox Grid.Row="0" Grid.Column="1" Name="NameTextBox" Watermark="輸入服務名稱" Margin="10,0,0,0"/>
                 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="費用:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
-                <NumericUpDown Grid.Row="1" Grid.Column="1" Name="AmountNumeric" Minimum="0" FormatString="C0" Margin="10,15,0,0"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="帳戶:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Name="AccountTextBox" Watermark="輸入帳戶資訊" Margin="10,15,0,0"/>
                 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="下次付款:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
-                <DatePicker Grid.Row="2" Grid.Column="1" Name="NextPaymentDatePicker" Margin="10,15,0,0"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="費用:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <NumericUpDown Grid.Row="2" Grid.Column="1" Name="AmountNumeric" Minimum="0" FormatString="C0" Margin="10,15,0,0"/>
                 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="開始日期:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
-                <DatePicker Grid.Row="3" Grid.Column="1" Name="StartDatePicker" Margin="10,15,0,0"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="下次付款:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <DatePicker Grid.Row="3" Grid.Column="1" Name="NextPaymentDatePicker" Margin="10,15,0,0"/>
                 
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="計費週期:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
-                <ComboBox Grid.Row="4" Grid.Column="1" Name="BillingCycleComboBox" Margin="10,15,0,0">
-                    <ComboBoxItem Content="每月" Tag="1"/>
-                    <ComboBoxItem Content="每季" Tag="3"/>
-                    <ComboBoxItem Content="每半年" Tag="6"/>
-                    <ComboBoxItem Content="每年" Tag="12"/>
-                </ComboBox>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="網址:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Name="UrlTextBox" Watermark="https://example.com" Margin="10,15,0,0"/>
                 
-                <TextBlock Grid.Row="5" Grid.Column="0" Text="分類:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
-                <ComboBox Grid.Row="5" Grid.Column="1" Name="CategoryComboBox" Margin="10,15,0,0">
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="描述:" VerticalAlignment="Top" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Name="DescriptionTextBox" 
+                        AcceptsReturn="True" 
+                        Height="80" 
+                        TextWrapping="Wrap" 
+                        Watermark="輸入服務描述" 
+                        Margin="10,15,0,0"/>
+                
+                <!-- 本地欄位（不同步到後端） -->
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="分類:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0" Foreground="#6B7280"/>
+                <ComboBox Grid.Row="6" Grid.Column="1" Name="CategoryComboBox" Margin="10,15,0,0" IsEnabled="False">
                     <ComboBoxItem Content="娛樂"/>
                     <ComboBoxItem Content="工作"/>
                     <ComboBoxItem Content="教育"/>
@@ -43,31 +47,9 @@
                     <ComboBoxItem Content="軟體"/>
                     <ComboBoxItem Content="其他"/>
                 </ComboBox>
-                
-                <TextBlock Grid.Row="6" Grid.Column="0" Text="付款方式:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
-                <ComboBox Grid.Row="6" Grid.Column="1" Name="PaymentMethodComboBox" Margin="10,15,0,0">
-                    <ComboBoxItem Content="信用卡"/>
-                    <ComboBoxItem Content="金融卡"/>
-                    <ComboBoxItem Content="PayPal"/>
-                    <ComboBoxItem Content="Apple Pay"/>
-                    <ComboBoxItem Content="Google Pay"/>
-                    <ComboBoxItem Content="銀行轉帳"/>
-                    <ComboBoxItem Content="其他"/>
-                </ComboBox>
-                
-                <TextBlock Grid.Row="7" Grid.Column="0" Text="網址:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
-                <TextBox Grid.Row="7" Grid.Column="1" Name="UrlTextBox" Watermark="https://example.com" Margin="10,15,0,0"/>
-                
-                <TextBlock Grid.Row="8" Grid.Column="0" Text="描述:" VerticalAlignment="Top" FontWeight="SemiBold" Margin="0,15,0,0"/>
-                <TextBox Grid.Row="8" Grid.Column="1" Name="DescriptionTextBox" 
-                        AcceptsReturn="True" 
-                        Height="80" 
-                        TextWrapping="Wrap" 
-                        Watermark="輸入服務描述" 
-                        Margin="10,15,0,0"/>
             </Grid>
             
-            <CheckBox Name="IsActiveCheckBox" Content="啟用此訂閱" IsChecked="True" Margin="0,10,0,0"/>
+            <CheckBox Name="IsActiveCheckBox" Content="啟用此訂閱 (僅本地)" IsChecked="True" Margin="0,10,0,0" IsEnabled="False" Foreground="#6B7280"/>
             
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,30,0,0">
                 <Button Name="CancelButton" Content="取消" Padding="15,8" Background="#6B7280" Foreground="White" CornerRadius="6"/>

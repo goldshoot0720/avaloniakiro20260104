@@ -26,6 +26,12 @@ public partial class SystemSettings : ObservableObject
     [ObservableProperty]
     private int _autoSaveInterval = 5; // 分鐘
 
+    [ObservableProperty]
+    private bool _useGraphQL = true; // 預設使用 GraphQL
+
+    [ObservableProperty]
+    private string _currentApiType = "GraphQL";
+
     public SystemSettings()
     {
         // 預設值已在屬性中設定
@@ -48,5 +54,7 @@ public partial class SystemSettings : ObservableObject
         Language = loadedSettings.Language;
         AutoSave = loadedSettings.AutoSave;
         AutoSaveInterval = loadedSettings.AutoSaveInterval;
+        UseGraphQL = loadedSettings.UseGraphQL;
+        CurrentApiType = loadedSettings.CurrentApiType;
     }
 }

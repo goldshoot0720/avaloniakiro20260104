@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using avaloniakiro20260104.Models;
@@ -45,7 +46,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _statusMessage = "";
 
-    private ApiService? _apiService;
+    private IApiService? _apiService;
 
     public MainWindowViewModel()
     {
@@ -60,8 +61,19 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (SystemSettings?.NhostSubdomain != null && SystemSettings?.NhostAdminSecret != null)
             {
-                _apiService = new ApiService(SystemSettings.NhostSubdomain, SystemSettings.NhostAdminSecret);
-                StatusMessage = "API 服務初始化成功";
+                // 根據設定選擇 API 類型
+                var apiType = SystemSettings.UseGraphQL ? 
+                    ApiServiceFactory.ApiType.GraphQL : 
+                    ApiServiceFactory.ApiType.REST;
+                
+                _apiService = ApiServiceFactory.CreateApiService(
+                    apiType,
+                    SystemSettings.NhostSubdomain, 
+                    SystemSettings.NhostAdminSecret
+                );
+                
+                SystemSettings.CurrentApiType = SystemSettings.UseGraphQL ? "GraphQL" : "REST";
+                StatusMessage = $"{SystemSettings.CurrentApiType} API 服務初始化成功";
             }
             else
             {
@@ -140,7 +152,9 @@ public partial class MainWindowViewModel : ViewModelBase
                 FoodItems = new ObservableCollection<FoodItem>();
             
             FoodItems.Clear();
-            foreach (var item in foodItems)
+            // 按到期日期排序：由近至遠（最近的日期在前面）
+            var sortedFoodItems = foodItems.OrderBy(f => f.ToDate).ToList();
+            foreach (var item in sortedFoodItems)
             {
                 FoodItems.Add(item);
             }
@@ -151,7 +165,9 @@ public partial class MainWindowViewModel : ViewModelBase
                 Subscriptions = new ObservableCollection<Subscription>();
                 
             Subscriptions.Clear();
-            foreach (var subscription in subscriptions)
+            // 按下次付款日期排序：由近至遠（最近的日期在前面）
+            var sortedSubscriptions = subscriptions.OrderBy(s => s.NextPaymentDate).ToList();
+            foreach (var subscription in sortedSubscriptions)
             {
                 Subscriptions.Add(subscription);
             }
@@ -177,7 +193,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (savedFoodItems.Count > 0)
         {
-            FoodItems = savedFoodItems;
+            if (FoodItems == null)
+                FoodItems = new ObservableCollection<FoodItem>();
+            FoodItems.Clear();
+            // 按到期日期排序：由近至遠（最近的日期在前面）
+            var sortedFoodItems = savedFoodItems.OrderBy(f => f.ToDate).ToList();
+            foreach (var item in sortedFoodItems)
+            {
+                FoodItems.Add(item);
+            }
         }
         else
         {
@@ -186,7 +210,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (savedSubscriptions.Count > 0)
         {
-            Subscriptions = savedSubscriptions;
+            if (Subscriptions == null)
+                Subscriptions = new ObservableCollection<Subscription>();
+            Subscriptions.Clear();
+            // 按下次付款日期排序：由近至遠（最近的日期在前面）
+            var sortedSubscriptions = savedSubscriptions.OrderBy(s => s.NextPaymentDate).ToList();
+            foreach (var subscription in sortedSubscriptions)
+            {
+                Subscriptions.Add(subscription);
+            }
         }
         else
         {
@@ -201,16 +233,36 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void InitializeSampleFoodData()
     {
-        FoodItems.Add(new FoodItem { Id = "1", Name = "【蛋糕】五香滷蛋休閒丸子", ExpiryDate = DateTime.Now.AddDays(6), Quantity = 3, Category = "零食", Location = "冰箱" });
-        FoodItems.Add(new FoodItem { Id = "2", Name = "【蛋糕】日式滷蛋休閒丸子", ExpiryDate = DateTime.Now.AddDays(7), Quantity = 6, Category = "零食", Location = "冰箱" });
-        FoodItems.Add(new FoodItem { Id = "3", Name = "樂事", ExpiryDate = DateTime.Now.AddDays(22), Quantity = 5, Category = "零食", Location = "櫥櫃" });
+        // 按到期日期排序：由近至遠
+        var sampleFoodItems = new List<FoodItem>
+        {
+            new FoodItem { Id = "1", Name = "【蛋糕】五香滷蛋休閒丸子", ToDate = DateTime.Now.AddDays(6), Amount = 3 },
+            new FoodItem { Id = "2", Name = "【蛋糕】日式滷蛋休閒丸子", ToDate = DateTime.Now.AddDays(7), Amount = 6 },
+            new FoodItem { Id = "3", Name = "樂事", ToDate = DateTime.Now.AddDays(22), Amount = 5 }
+        };
+
+        var sortedItems = sampleFoodItems.OrderBy(f => f.ToDate).ToList();
+        foreach (var item in sortedItems)
+        {
+            FoodItems.Add(item);
+        }
     }
 
     private void InitializeSampleSubscriptionData()
     {
-        Subscriptions.Add(new Subscription { Id = "1", Name = "kiro pro", NextPaymentDate = DateTime.Now.AddDays(1), Amount = 640, Category = "工作" });
-        Subscriptions.Add(new Subscription { Id = "2", Name = "天氣/虛擬中心儲料", NextPaymentDate = DateTime.Now.AddDays(2), Amount = 530, Category = "雲端服務" });
-        Subscriptions.Add(new Subscription { Id = "3", Name = "Netflix", NextPaymentDate = DateTime.Now.AddDays(11), Amount = 290, Category = "娛樂" });
+        // 按下次付款日期排序：由近至遠
+        var sampleSubscriptions = new List<Subscription>
+        {
+            new Subscription { Id = "1", Name = "kiro pro", NextPaymentDate = DateTime.Now.AddDays(1), Amount = 640, Category = "工作" },
+            new Subscription { Id = "2", Name = "天氣/虛擬中心儲料", NextPaymentDate = DateTime.Now.AddDays(2), Amount = 530, Category = "雲端服務" },
+            new Subscription { Id = "3", Name = "Netflix", NextPaymentDate = DateTime.Now.AddDays(11), Amount = 290, Category = "娛樂" }
+        };
+
+        var sortedSubscriptions = sampleSubscriptions.OrderBy(s => s.NextPaymentDate).ToList();
+        foreach (var subscription in sortedSubscriptions)
+        {
+            Subscriptions.Add(subscription);
+        }
     }
 
     private void InitializeSampleVideoData()
@@ -227,8 +279,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     // 統計屬性
     public int TotalFoodItems => FoodItems?.Count ?? 0;
-    public int ExpiringFoodItems => FoodItems?.Count(f => f.ExpiryDate <= DateTime.Now.AddDays(7) && f.ExpiryDate > DateTime.Now) ?? 0;
-    public int ExpiredFoodItems => FoodItems?.Count(f => f.ExpiryDate <= DateTime.Now) ?? 0;
+    public int ExpiringFoodItems => FoodItems?.Count(f => f.ToDate <= DateTime.Now.AddDays(7) && f.ToDate > DateTime.Now) ?? 0;
+    public int ExpiredFoodItems => FoodItems?.Count(f => f.ToDate <= DateTime.Now) ?? 0;
     
     public int TotalSubscriptions => Subscriptions?.Count ?? 0;
     public int UpcomingSubscriptions => Subscriptions?.Count(s => s.NextPaymentDate <= DateTime.Now.AddDays(3)) ?? 0;
@@ -324,6 +376,8 @@ public partial class MainWindowViewModel : ViewModelBase
                     if (createdItem != null)
                     {
                         FoodItems.Add(createdItem);
+                        // 重新排序：按到期日期由近至遠
+                        SortFoodItems();
                         StatusMessage = "食品新增成功";
                     }
                     else
@@ -334,9 +388,15 @@ public partial class MainWindowViewModel : ViewModelBase
                 else
                 {
                     // 本地創建
-                    var maxId = FoodItems.Count > 0 ? FoodItems.Max(f => int.TryParse(f.Id, out var id) ? id : 0) : 0;
+                    var maxId = FoodItems.Count > 0 ? 
+                        FoodItems.Where(f => int.TryParse(f.Id, out _))
+                                 .Select(f => int.Parse(f.Id))
+                                 .DefaultIfEmpty(0)
+                                 .Max() : 0;
                     result.Id = (maxId + 1).ToString();
                     FoodItems.Add(result);
+                    // 重新排序：按到期日期由近至遠
+                    SortFoodItems();
                     DataService.SaveFoodItems(FoodItems);
                     StatusMessage = "食品新增成功（本地）";
                 }
@@ -370,6 +430,9 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 if (_apiService != null)
                 {
+                    Console.WriteLine($"Attempting to update food item with ID: {foodItem.Id}");
+                    Console.WriteLine($"Original item: {foodItem.Name}, New data: {result.Name}");
+                    
                     // 使用 API 更新
                     var updatedItem = await _apiService.UpdateFoodItemAsync(foodItem.Id, result);
                     if (updatedItem != null)
@@ -377,13 +440,41 @@ public partial class MainWindowViewModel : ViewModelBase
                         var index = FoodItems.IndexOf(foodItem);
                         if (index >= 0)
                         {
+                            // 確保 ID 正確
+                            updatedItem.Id = foodItem.Id;
+                            
                             FoodItems[index] = updatedItem;
+                            StatusMessage = "食品更新成功";
+                            
+                            Console.WriteLine($"Successfully updated food item: {updatedItem.Name}");
+                            
+                            // 更新統計資料
+                            OnPropertyChanged(nameof(TotalFoodItems));
+                            OnPropertyChanged(nameof(ExpiringFoodItems));
+                            OnPropertyChanged(nameof(ExpiredFoodItems));
                         }
-                        StatusMessage = "食品更新成功";
+                        else
+                        {
+                            StatusMessage = "找不到要更新的食品項目";
+                            Console.WriteLine("Could not find food item in collection to update");
+                        }
                     }
                     else
                     {
-                        StatusMessage = "食品更新失敗";
+                        StatusMessage = "食品更新失敗 - API 返回空結果，但可能已成功更新";
+                        Console.WriteLine("API returned null, but update might have succeeded. Refreshing data...");
+                        
+                        // 嘗試重新載入資料以確認更新是否成功
+                        try
+                        {
+                            await LoadDataFromApi();
+                            StatusMessage = "已重新載入資料，請檢查更新是否成功";
+                        }
+                        catch (Exception refreshEx)
+                        {
+                            Console.WriteLine($"Failed to refresh data: {refreshEx.Message}");
+                            StatusMessage = "更新狀態不明，請手動重新整理";
+                        }
                     }
                 }
                 else
@@ -396,12 +487,18 @@ public partial class MainWindowViewModel : ViewModelBase
                         FoodItems[index] = result;
                         DataService.SaveFoodItems(FoodItems);
                         StatusMessage = "食品更新成功（本地）";
+                        
+                        // 更新統計資料
+                        OnPropertyChanged(nameof(TotalFoodItems));
+                        OnPropertyChanged(nameof(ExpiringFoodItems));
+                        OnPropertyChanged(nameof(ExpiredFoodItems));
                     }
                 }
             }
             catch (Exception ex)
             {
                 StatusMessage = $"更新食品失敗: {ex.Message}";
+                Console.WriteLine($"EditFoodItem Exception: {ex}");
             }
             finally
             {
@@ -481,6 +578,8 @@ public partial class MainWindowViewModel : ViewModelBase
                     if (createdItem != null)
                     {
                         Subscriptions.Add(createdItem);
+                        // 重新排序：按下次付款日期由近至遠
+                        SortSubscriptions();
                         StatusMessage = "訂閱新增成功";
                     }
                     else
@@ -491,9 +590,15 @@ public partial class MainWindowViewModel : ViewModelBase
                 else
                 {
                     // 本地創建
-                    var maxId = Subscriptions.Count > 0 ? Subscriptions.Max(s => int.TryParse(s.Id, out var id) ? id : 0) : 0;
+                    var maxId = Subscriptions.Count > 0 ? 
+                        Subscriptions.Where(s => int.TryParse(s.Id, out _))
+                                    .Select(s => int.Parse(s.Id))
+                                    .DefaultIfEmpty(0)
+                                    .Max() : 0;
                     result.Id = (maxId + 1).ToString();
                     Subscriptions.Add(result);
+                    // 重新排序：按下次付款日期由近至遠
+                    SortSubscriptions();
                     DataService.SaveSubscriptions(Subscriptions);
                     StatusMessage = "訂閱新增成功（本地）";
                 }
@@ -621,7 +726,30 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (_apiService != null)
         {
-            await LoadDataFromApi();
+            IsLoading = true;
+            StatusMessage = "重新載入資料中...";
+            
+            try
+            {
+                // 強制從 API 重新載入資料
+                await LoadDataFromApi();
+                
+                // 更新統計資料
+                OnPropertyChanged(nameof(TotalFoodItems));
+                OnPropertyChanged(nameof(ExpiringFoodItems));
+                OnPropertyChanged(nameof(ExpiredFoodItems));
+                OnPropertyChanged(nameof(TotalSubscriptions));
+                OnPropertyChanged(nameof(UpcomingSubscriptions));
+                OnPropertyChanged(nameof(MonthlyTotal));
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"重新載入失敗: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
         else
         {
@@ -630,9 +758,131 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ReconnectApi()
+    private async Task ReconnectApi()
     {
         InitializeApiService();
         StatusMessage = "API 服務已重新連接";
+        
+        // 如果 API 服務初始化成功，立即載入資料
+        if (_apiService != null)
+        {
+            await RefreshData();
+        }
+    }
+
+    [RelayCommand]
+    private async Task SwitchToGraphQL()
+    {
+        IsLoading = true;
+        StatusMessage = "切換到 GraphQL API...";
+
+        try
+        {
+            // 釋放舊的 API 服務
+            _apiService?.Dispose();
+            
+            // 創建 GraphQL API 服務
+            if (SystemSettings?.NhostSubdomain != null && SystemSettings?.NhostAdminSecret != null)
+            {
+                _apiService = ApiServiceFactory.CreateApiService(
+                    ApiServiceFactory.ApiType.GraphQL,
+                    SystemSettings.NhostSubdomain,
+                    SystemSettings.NhostAdminSecret
+                );
+                
+                // 更新設定
+                SystemSettings.UseGraphQL = true;
+                SystemSettings.CurrentApiType = "GraphQL";
+                SystemSettings.SaveSettings();
+                
+                // 重新載入資料
+                await LoadDataFromApi();
+                StatusMessage = "已切換到 GraphQL API";
+            }
+            else
+            {
+                StatusMessage = "API 設定不完整";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"切換到 GraphQL 失敗: {ex.Message}";
+            Console.WriteLine($"SwitchToGraphQL Exception: {ex}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SwitchToREST()
+    {
+        IsLoading = true;
+        StatusMessage = "切換到 REST API...";
+
+        try
+        {
+            // 釋放舊的 API 服務
+            _apiService?.Dispose();
+            
+            // 創建 REST API 服務
+            if (SystemSettings?.NhostSubdomain != null && SystemSettings?.NhostAdminSecret != null)
+            {
+                _apiService = ApiServiceFactory.CreateApiService(
+                    ApiServiceFactory.ApiType.REST,
+                    SystemSettings.NhostSubdomain,
+                    SystemSettings.NhostAdminSecret
+                );
+                
+                // 更新設定
+                SystemSettings.UseGraphQL = false;
+                SystemSettings.CurrentApiType = "REST";
+                SystemSettings.SaveSettings();
+                
+                // 重新載入資料
+                await LoadDataFromApi();
+                StatusMessage = "已切換到 REST API";
+            }
+            else
+            {
+                StatusMessage = "API 設定不完整";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"切換到 REST 失敗: {ex.Message}";
+            Console.WriteLine($"SwitchToREST Exception: {ex}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// 重新排序食品項目：按到期日期由近至遠
+    /// </summary>
+    private void SortFoodItems()
+    {
+        var sortedItems = FoodItems.OrderBy(f => f.ToDate).ToList();
+        FoodItems.Clear();
+        foreach (var item in sortedItems)
+        {
+            FoodItems.Add(item);
+        }
+    }
+
+    /// <summary>
+    /// 重新排序訂閱項目：按下次付款日期由近至遠
+    /// </summary>
+    private void SortSubscriptions()
+    {
+        var sortedItems = Subscriptions.OrderBy(s => s.NextPaymentDate).ToList();
+        Subscriptions.Clear();
+        foreach (var item in sortedItems)
+        {
+            Subscriptions.Add(item);
+        }
     }
 }

@@ -4,10 +4,28 @@
 此應用程式已整合 nhost REST API，支援食品和訂閱管理的完整 CRUD 操作。
 
 ## API 端點
-- 食品管理：`https://uxgwdiuehabbzenwtcqo.hasura.eu-central-1.nhost.run/api/rest/food/`
-- 訂閱管理：`https://uxgwdiuehabbzenwtcqo.hasura.eu-central-1.nhost.run/api/rest/subscription/`
 
-**注意：** nhost REST API 使用 POST 方法進行更新操作，而不是傳統的 PUT/PATCH 方法。
+### 基礎 URL
+`https://uxgwdiuehabbzenwtcqo.hasura.eu-central-1.nhost.run/api/rest`
+
+### 訂閱管理端點
+- **GET** `/subscription` - 獲取所有訂閱項目
+- **POST** `/subscription` - 創建新訂閱項目 (insert_subscription_one)
+- **GET** `/subscription/:id` - 獲取指定訂閱項目 (subscription_by_pk)
+- **POST** `/subscription/:id` - 更新指定訂閱項目 (update_subscription_by_pk)
+- **DELETE** `/subscription/:id` - 刪除指定訂閱項目 (delete_subscription_by_pk)
+
+### 食品管理端點
+- **GET** `/food` - 獲取所有食品項目
+- **POST** `/food` - 創建新食品項目 (insert_food_one)
+- **GET** `/food/:id` - 獲取指定食品項目 (food_by_pk)
+- **POST** `/food/:id` - 更新指定食品項目 (update_food_by_pk)
+- **DELETE** `/food/:id` - 刪除指定食品項目 (delete_food_by_pk)
+
+**注意：** 
+- nhost REST API 使用 POST 方法進行更新操作，而不是傳統的 PUT/PATCH 方法
+- 所有端點都是 GraphQL 請求的 REST 包裝器
+- 需要在請求標頭中包含 `x-hasura-admin-secret` 進行認證
 
 ## 功能特色
 
@@ -17,56 +35,87 @@
 - **智能重試**：提供重新連接 API 的功能
 
 ### 📊 食品管理 API
-- **GET** `/food/` - 獲取所有食品項目
+- **GET** `/food` - 獲取所有食品項目
 - **GET** `/food/{id}` - 獲取指定食品項目
-- **POST** `/food/` - 創建新食品項目
+- **POST** `/food` - 創建新食品項目
 - **POST** `/food/{id}` - 更新指定食品項目
 - **DELETE** `/food/{id}` - 刪除指定食品項目
 
 ### 📋 訂閱管理 API
-- **GET** `/subscription/` - 獲取所有訂閱項目
+- **GET** `/subscription` - 獲取所有訂閱項目
 - **GET** `/subscription/{id}` - 獲取指定訂閱項目
-- **POST** `/subscription/` - 創建新訂閱項目
+- **POST** `/subscription` - 創建新訂閱項目
 - **POST** `/subscription/{id}` - 更新指定訂閱項目
 - **DELETE** `/subscription/{id}` - 刪除指定訂閱項目
 
 ## 資料模型
 
 ### FoodItem (食品項目)
+
+**後端支援的完整欄位：**
 ```json
 {
-  "id": 1,
+  "id": "1",
   "name": "食品名稱",
-  "expiry_date": "2024-01-15T00:00:00Z",
-  "quantity": 5,
-  "category": "蔬菜",
-  "location": "冰箱",
-  "notes": "備註資訊",
-  "purchase_date": "2024-01-01T00:00:00Z",
-  "image_url": "",
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
+  "amount": 5,
+  "to_date": "2024-01-15T00:00:00Z",
+  "photo": "https://example.com/image.jpg",
+  "photohash": null,
+  "price": null,
+  "shop": null
 }
 ```
 
+**支援的 CRUD 操作：**
+- ✅ 讀取 (GET)
+- ✅ 創建 (POST)
+- ✅ 更新 (POST)
+- ✅ 刪除 (DELETE)
+
+**欄位對應：**
+- `name` → FoodItem.Name
+- `amount` → FoodItem.Amount
+- `to_date` → FoodItem.ToDate
+- `photo` → FoodItem.Photo
+- `photohash` → FoodItem.PhotoHash
+- `price` → FoodItem.Price
+- `shop` → FoodItem.Shop
+
 ### Subscription (訂閱項目)
+
+**後端支援的核心欄位：**
 ```json
 {
-  "id": 1,
+  "id": "1",
   "name": "Netflix",
-  "next_payment_date": "2024-02-01T00:00:00Z",
-  "amount": 290,
-  "category": "娛樂",
-  "description": "影音串流服務",
-  "is_active": true,
-  "payment_method": "信用卡",
-  "billing_cycle": 1,
-  "start_date": "2024-01-01T00:00:00Z",
-  "url": "https://netflix.com",
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
+  "price": 290,
+  "site": "https://netflix.com",
+  "note": "影音串流服務"
 }
 ```
+
+**支援的 CRUD 操作：**
+- ✅ 讀取 (GET) - 包含完整欄位
+- ✅ 創建 (POST) - 僅支援基本欄位
+- ✅ 更新 (POST) - 僅支援基本欄位
+- ✅ 刪除 (DELETE)
+
+**欄位對應：**
+- `name` → Subscription.Name
+- `price` → Subscription.Amount
+- `site` → Subscription.Url
+- `note` → Subscription.Description
+
+**僅讀取時可用的欄位：**
+- `nextdate` → Subscription.NextPaymentDate (讀取時可用，寫入時不支援)
+- `account` → Subscription.Account (讀取時可用，寫入時不支援)
+
+**僅本地儲存的欄位（不同步到後端）：**
+- `category`: 分類（娛樂、工作等）
+- `is_active`: 是否啟用
+- `payment_method`: 付款方式
+- `billing_cycle`: 計費週期
+- `start_date`: 開始日期
 
 ## 使用方式
 
