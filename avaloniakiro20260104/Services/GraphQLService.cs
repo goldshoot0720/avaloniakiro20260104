@@ -132,7 +132,7 @@ public class GraphQLService : IApiService
     public async Task<FoodItem?> GetFoodItemByIdAsync(string id)
     {
         const string query = @"
-            query GetFoodItemById($id: String!) {
+            query GetFoodItemById($id: uuid!) {
                 food_by_pk(id: $id) {
                     id
                     name
@@ -193,7 +193,7 @@ public class GraphQLService : IApiService
     public async Task<FoodItem?> UpdateFoodItemAsync(string id, FoodItem foodItem)
     {
         const string mutation = @"
-            mutation UpdateFoodItem($id: String!, $changes: food_set_input!) {
+            mutation UpdateFoodItem($id: uuid!, $changes: food_set_input!) {
                 update_food_by_pk(pk_columns: {id: $id}, _set: $changes) {
                     id
                     name
@@ -231,7 +231,7 @@ public class GraphQLService : IApiService
     public async Task<bool> DeleteFoodItemAsync(string id)
     {
         const string mutation = @"
-            mutation DeleteFoodItem($id: String!) {
+            mutation DeleteFoodItem($id: uuid!) {
                 delete_food_by_pk(id: $id) {
                     id
                 }
@@ -274,7 +274,7 @@ public class GraphQLService : IApiService
     public async Task<Subscription?> GetSubscriptionByIdAsync(string id)
     {
         const string query = @"
-            query GetSubscriptionById($id: String!) {
+            query GetSubscriptionById($id: uuid!) {
                 subscription_by_pk(id: $id) {
                     id
                     name
@@ -331,7 +331,7 @@ public class GraphQLService : IApiService
     public async Task<Subscription?> UpdateSubscriptionAsync(string id, Subscription subscription)
     {
         const string mutation = @"
-            mutation UpdateSubscription($id: String!, $changes: subscription_set_input!) {
+            mutation UpdateSubscription($id: uuid!, $changes: subscription_set_input!) {
                 update_subscription_by_pk(pk_columns: {id: $id}, _set: $changes) {
                     id
                     name
@@ -367,7 +367,7 @@ public class GraphQLService : IApiService
     public async Task<bool> DeleteSubscriptionAsync(string id)
     {
         const string mutation = @"
-            mutation DeleteSubscription($id: String!) {
+            mutation DeleteSubscription($id: uuid!) {
                 delete_subscription_by_pk(id: $id) {
                     id
                 }
