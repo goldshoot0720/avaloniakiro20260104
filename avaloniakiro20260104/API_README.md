@@ -7,6 +7,8 @@
 - 食品管理：`https://uxgwdiuehabbzenwtcqo.hasura.eu-central-1.nhost.run/api/rest/food/`
 - 訂閱管理：`https://uxgwdiuehabbzenwtcqo.hasura.eu-central-1.nhost.run/api/rest/subscription/`
 
+**注意：** nhost REST API 使用 POST 方法進行更新操作，而不是傳統的 PUT/PATCH 方法。
+
 ## 功能特色
 
 ### 🔄 自動切換模式
@@ -16,14 +18,16 @@
 
 ### 📊 食品管理 API
 - **GET** `/food/` - 獲取所有食品項目
+- **GET** `/food/{id}` - 獲取指定食品項目
 - **POST** `/food/` - 創建新食品項目
-- **PUT** `/food/{id}` - 更新指定食品項目
+- **POST** `/food/{id}` - 更新指定食品項目
 - **DELETE** `/food/{id}` - 刪除指定食品項目
 
 ### 📋 訂閱管理 API
 - **GET** `/subscription/` - 獲取所有訂閱項目
+- **GET** `/subscription/{id}` - 獲取指定訂閱項目
 - **POST** `/subscription/` - 創建新訂閱項目
-- **PUT** `/subscription/{id}` - 更新指定訂閱項目
+- **POST** `/subscription/{id}` - 更新指定訂閱項目
 - **DELETE** `/subscription/{id}` - 刪除指定訂閱項目
 
 ## 資料模型

@@ -162,8 +162,8 @@ public class ApiService
             
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             
-            // 嘗試 PATCH 方法，因為有些 REST API 不支援 PUT
-            var response = await _httpClient.PatchAsync($"{_baseUrl}/food/{id}", content);
+            // nhost REST API 使用 POST 方法進行更新操作
+            var response = await _httpClient.PostAsync($"{_baseUrl}/food/{id}", content);
             
             Console.WriteLine($"Update response status: {response.StatusCode}");
             
@@ -197,41 +197,6 @@ public class ApiService
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"Update Food API Error: {response.StatusCode} - {errorContent}");
-                
-                // 如果 PATCH 失敗，嘗試 PUT
-                Console.WriteLine("Trying PUT method...");
-                response = await _httpClient.PutAsync($"{_baseUrl}/food/{id}", content);
-                Console.WriteLine($"PUT response status: {response.StatusCode}");
-                
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseJson = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"PUT food response: {responseJson}");
-                    
-                    try
-                    {
-                        var result = JsonSerializer.Deserialize<FoodItem>(responseJson, GetJsonOptions());
-                        return result;
-                    }
-                    catch
-                    {
-                        var jsonDoc = JsonDocument.Parse(responseJson);
-                        if (jsonDoc.RootElement.TryGetProperty("food", out var foodElement))
-                        {
-                            var result = JsonSerializer.Deserialize<FoodItem>(foodElement.GetRawText(), GetJsonOptions());
-                            return result;
-                        }
-                        
-                        foodItem.Id = id;
-                        return foodItem;
-                    }
-                }
-                else
-                {
-                    var putErrorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"PUT Food API Error: {response.StatusCode} - {putErrorContent}");
-                }
-                
                 return null;
             }
         }
@@ -373,8 +338,8 @@ public class ApiService
             
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             
-            // 嘗試 PATCH 方法
-            var response = await _httpClient.PatchAsync($"{_baseUrl}/subscription/{id}", content);
+            // nhost REST API 使用 POST 方法進行更新操作
+            var response = await _httpClient.PostAsync($"{_baseUrl}/subscription/{id}", content);
             
             Console.WriteLine($"Update subscription response status: {response.StatusCode}");
             
@@ -408,41 +373,6 @@ public class ApiService
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"Update Subscription API Error: {response.StatusCode} - {errorContent}");
-                
-                // 如果 PATCH 失敗，嘗試 PUT
-                Console.WriteLine("Trying PUT method for subscription...");
-                response = await _httpClient.PutAsync($"{_baseUrl}/subscription/{id}", content);
-                Console.WriteLine($"PUT subscription response status: {response.StatusCode}");
-                
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseJson = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"PUT subscription response: {responseJson}");
-                    
-                    try
-                    {
-                        var result = JsonSerializer.Deserialize<Subscription>(responseJson, GetJsonOptions());
-                        return result;
-                    }
-                    catch
-                    {
-                        var jsonDoc = JsonDocument.Parse(responseJson);
-                        if (jsonDoc.RootElement.TryGetProperty("subscription", out var subscriptionElement))
-                        {
-                            var result = JsonSerializer.Deserialize<Subscription>(subscriptionElement.GetRawText(), GetJsonOptions());
-                            return result;
-                        }
-                        
-                        subscription.Id = id;
-                        return subscription;
-                    }
-                }
-                else
-                {
-                    var putErrorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"PUT Subscription API Error: {response.StatusCode} - {putErrorContent}");
-                }
-                
                 return null;
             }
         }
