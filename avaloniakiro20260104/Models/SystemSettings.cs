@@ -12,6 +12,9 @@ public partial class SystemSettings : ObservableObject
     private string _nhostAdminSecret = "cu#34&yjF3Cr%fgxB#WA,4r4^c=Igcwr";
 
     [ObservableProperty]
+    private string _nhostRegion = "eu-central-1";
+
+    [ObservableProperty]
     private bool _enableNotifications = true;
 
     [ObservableProperty]
@@ -49,6 +52,7 @@ public partial class SystemSettings : ObservableObject
         // 複製載入的設定到當前實例
         NhostSubdomain = loadedSettings.NhostSubdomain;
         NhostAdminSecret = loadedSettings.NhostAdminSecret;
+        NhostRegion = loadedSettings.NhostRegion;
         EnableNotifications = loadedSettings.EnableNotifications;
         Theme = loadedSettings.Theme;
         Language = loadedSettings.Language;

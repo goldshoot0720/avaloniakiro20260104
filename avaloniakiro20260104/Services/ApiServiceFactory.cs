@@ -19,13 +19,14 @@ public static class ApiServiceFactory
     /// <param name="apiType">API 類型</param>
     /// <param name="subdomain">Hasura 子域名</param>
     /// <param name="adminSecret">管理員密鑰</param>
+    /// <param name="region">區域</param>
     /// <returns>API 服務實例</returns>
-    public static IApiService CreateApiService(ApiType apiType, string subdomain, string adminSecret)
+    public static IApiService CreateApiService(ApiType apiType, string subdomain, string adminSecret, string region = "eu-central-1")
     {
         return apiType switch
         {
-            ApiType.REST => new ApiService(subdomain, adminSecret),
-            ApiType.GraphQL => new GraphQLService(subdomain, adminSecret),
+            ApiType.REST => new ApiService(subdomain, adminSecret, region),
+            ApiType.GraphQL => new GraphQLService(subdomain, adminSecret, region),
             _ => throw new ArgumentException($"不支援的 API 類型: {apiType}")
         };
     }
@@ -36,9 +37,10 @@ public static class ApiServiceFactory
     /// <param name="useGraphQL">是否使用 GraphQL</param>
     /// <param name="subdomain">Hasura 子域名</param>
     /// <param name="adminSecret">管理員密鑰</param>
+    /// <param name="region">區域</param>
     /// <returns>API 服務實例</returns>
-    public static IApiService CreateApiService(bool useGraphQL, string subdomain, string adminSecret)
+    public static IApiService CreateApiService(bool useGraphQL, string subdomain, string adminSecret, string region = "eu-central-1")
     {
-        return CreateApiService(useGraphQL ? ApiType.GraphQL : ApiType.REST, subdomain, adminSecret);
+        return CreateApiService(useGraphQL ? ApiType.GraphQL : ApiType.REST, subdomain, adminSecret, region);
     }
 }

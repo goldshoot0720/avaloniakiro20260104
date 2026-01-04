@@ -19,15 +19,17 @@ public class GraphQLService : IApiService
     private readonly string _endpoint;
     private readonly string _adminSecret;
 
-    public GraphQLService(string subdomain, string adminSecret)
+    public GraphQLService(string subdomain, string adminSecret, string region = "eu-central-1")
     {
         if (string.IsNullOrWhiteSpace(subdomain))
             throw new ArgumentException("Subdomain cannot be null or empty", nameof(subdomain));
         if (string.IsNullOrWhiteSpace(adminSecret))
             throw new ArgumentException("Admin secret cannot be null or empty", nameof(adminSecret));
+        if (string.IsNullOrWhiteSpace(region))
+            region = "eu-central-1"; // 預設值
 
         _httpClient = new HttpClient();
-        _endpoint = $"https://{subdomain}.hasura.eu-central-1.nhost.run/v1/graphql";
+        _endpoint = $"https://{subdomain}.hasura.{region}.nhost.run/v1/graphql";
         _adminSecret = adminSecret;
         
         // 設定預設標頭
@@ -73,11 +75,11 @@ public class GraphQLService : IApiService
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(_endpoint, content);
             
+            var responseJson = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"GraphQL Response: {responseJson}");
+            
             if (response.IsSuccessStatusCode)
             {
-                var responseJson = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"GraphQL Response: {responseJson}");
-                
                 var result = JsonSerializer.Deserialize<GraphQLResponse<T>>(responseJson, GetJsonOptions());
                 
                 if (result.Errors != null && result.Errors.Count > 0)
@@ -90,8 +92,7 @@ public class GraphQLService : IApiService
             }
             else
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"HTTP Error: {response.StatusCode} - {errorContent}");
+                throw new Exception($"HTTP Error: {response.StatusCode} - {responseJson}");
             }
         }
         catch (Exception ex)

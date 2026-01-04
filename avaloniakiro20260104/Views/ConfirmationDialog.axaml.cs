@@ -5,8 +5,6 @@ namespace avaloniakiro20260104.Views;
 
 public partial class ConfirmationDialog : Window
 {
-    public bool Result { get; private set; } = false;
-
     public ConfirmationDialog()
     {
         InitializeComponent();
@@ -26,13 +24,11 @@ public partial class ConfirmationDialog : Window
 
     private void OnConfirmClick(object? sender, RoutedEventArgs e)
     {
-        Result = true;
-        Close();
+        Close(true); // 返回 true 表示確認
     }
 
     private void OnCancelClick(object? sender, RoutedEventArgs e)
     {
-        Result = false;
-        Close();
+        Close(false); // 返回 false 表示取消
     }
 }

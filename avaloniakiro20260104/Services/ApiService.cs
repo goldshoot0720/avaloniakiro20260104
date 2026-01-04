@@ -15,15 +15,17 @@ public class ApiService : IApiService
     private readonly string _baseUrl;
     private readonly string _adminSecret;
 
-    public ApiService(string subdomain, string adminSecret)
+    public ApiService(string subdomain, string adminSecret, string region = "eu-central-1")
     {
         if (string.IsNullOrWhiteSpace(subdomain))
             throw new ArgumentException("Subdomain cannot be null or empty", nameof(subdomain));
         if (string.IsNullOrWhiteSpace(adminSecret))
             throw new ArgumentException("Admin secret cannot be null or empty", nameof(adminSecret));
+        if (string.IsNullOrWhiteSpace(region))
+            region = "eu-central-1"; // 預設值
 
         _httpClient = new HttpClient();
-        _baseUrl = $"https://{subdomain}.hasura.eu-central-1.nhost.run/api/rest";
+        _baseUrl = $"https://{subdomain}.hasura.{region}.nhost.run/api/rest";
         _adminSecret = adminSecret;
         
         // 設定預設標頭 - 不要在這裡設定 Content-Type

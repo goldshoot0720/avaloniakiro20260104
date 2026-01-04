@@ -198,8 +198,11 @@
 
                 <!-- 訂閱管理內容 -->
                 <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=訂閱管理}">
-                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,20">
-                        <TextBlock Grid.Column="0" Text="{Binding MonthlyTotal, StringFormat=總計 NT$ {0:N0}}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6" VerticalAlignment="Center"/>
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,20">
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="20">
+                            <TextBlock Text="{Binding TotalSubscriptions, StringFormat=共 {0} 項訂閱}" FontSize="16" Foreground="#6B7280" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding MonthlyTotal, StringFormat=總計 NT$ {0:N0}}" FontSize="20" FontWeight="Bold" Foreground="#3B82F6" VerticalAlignment="Center"/>
+                        </StackPanel>
                         <Button Grid.Column="1" Content="🔄 重新整理" 
                                Command="{Binding RefreshDataCommand}"
                                IsEnabled="{Binding !IsLoading}"
@@ -329,15 +332,21 @@
                                 <StackPanel Spacing="15">
                                     <TextBlock Text="🔗 nhost 連接設定" FontSize="18" FontWeight="Bold" Foreground="#1F2937"/>
                                     
-                                    <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto" Margin="0,10,0,0">
+                                    <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto" Margin="0,10,0,0">
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Subdomain:" VerticalAlignment="Center" FontWeight="SemiBold"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" 
                                                 Text="{Binding SystemSettings.NhostSubdomain}" 
                                                 Watermark="輸入 nhost subdomain"
                                                 Margin="10,0,0,0"/>
                                         
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Admin Secret:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Region:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
                                         <TextBox Grid.Row="1" Grid.Column="1" 
+                                                Text="{Binding SystemSettings.NhostRegion}" 
+                                                Watermark="輸入 region (例如: eu-central-1)"
+                                                Margin="10,15,0,0"/>
+                                        
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Admin Secret:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" 
                                                 Text="{Binding SystemSettings.NhostAdminSecret}" 
                                                 Watermark="輸入 admin secret"
                                                 PasswordChar="*"
@@ -417,6 +426,65 @@
                                             <TextBlock Text="分鐘" VerticalAlignment="Center" Margin="5,0,0,0"/>
                                         </StackPanel>
                                     </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 數據導出區塊 -->
+                            <Border Background="White" CornerRadius="12" Padding="25">
+                                <StackPanel Spacing="15">
+                                    <TextBlock Text="📥 數據導出" FontSize="18" FontWeight="Bold" Foreground="#1F2937"/>
+                                    
+                                    <TextBlock Text="將您的數據導出為 CSV 格式，方便備份和分析。" 
+                                             FontSize="14" Foreground="#6B7280" TextWrapping="Wrap" Margin="0,5,0,15"/>
+                                    
+                                    <StackPanel Orientation="Horizontal" Spacing="15">
+                                        <Button Content="📄 下載食品數據 (nhostfood.csv)" 
+                                               Command="{Binding DownloadFoodCsvCommand}"
+                                               IsEnabled="{Binding !IsLoading}"
+                                               Background="#3B82F6" 
+                                               Foreground="White" 
+                                               Padding="15,8" 
+                                               CornerRadius="6"/>
+                                        <Button Content="📋 下載訂閱數據 (nhostsubscription.csv)" 
+                                               Command="{Binding DownloadSubscriptionCsvCommand}"
+                                               IsEnabled="{Binding !IsLoading}"
+                                               Background="#8B5CF6" 
+                                               Foreground="White" 
+                                               Padding="15,8" 
+                                               CornerRadius="6"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Orientation="Horizontal" Spacing="15" Margin="0,10,0,0">
+                                        <Button Content="📤 上傳食品 CSV 到 nhost" 
+                                               Command="{Binding UploadFoodCsvCommand}"
+                                               IsEnabled="{Binding !IsLoading}"
+                                               Background="#10B981" 
+                                               Foreground="White" 
+                                               Padding="15,8" 
+                                               CornerRadius="6"/>
+                                        <Button Content="📤 上傳訂閱 CSV 到 nhost" 
+                                               Command="{Binding UploadSubscriptionCsvCommand}"
+                                               IsEnabled="{Binding !IsLoading}"
+                                               Background="#F59E0B" 
+                                               Foreground="White" 
+                                               Padding="15,8" 
+                                               CornerRadius="6"/>
+                                    </StackPanel>
+                                    
+                                    <Border Background="#EFF6FF" CornerRadius="8" Padding="15" Margin="0,10,0,0">
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <TextBlock Text="💡" FontSize="16" VerticalAlignment="Top"/>
+                                            <StackPanel>
+                                                <TextBlock Text="CSV 文件說明" FontWeight="SemiBold" Foreground="#1E40AF"/>
+                                                <TextBlock Text="• nhostfood.csv: 包含所有食品項目的詳細信息（名稱、到期日、數量、價格等）" 
+                                                         FontSize="12" Foreground="#374151" TextWrapping="Wrap"/>
+                                                <TextBlock Text="• nhostsubscription.csv: 包含所有訂閱服務的詳細信息（名稱、下次付款日、金額等）" 
+                                                         FontSize="12" Foreground="#374151" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                                <TextBlock Text="• 上傳功能：選擇本地 CSV 檔案並上傳到 nhost 資料庫" 
+                                                         FontSize="12" Foreground="#374151" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
                                 </StackPanel>
                             </Border>
 
