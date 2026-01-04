@@ -65,6 +65,11 @@
                             CommandParameter="音樂歌詞"
                             Classes="menuButton"/>
                     
+                    <Button Content="⚙️ 系統設定" 
+                            Command="{Binding SelectMenuItemCommand}" 
+                            CommandParameter="系統設定"
+                            Classes="menuButton"/>
+                    
                     <Button Content="ℹ️ 關於我們" 
                             Command="{Binding SelectMenuItemCommand}" 
                             CommandParameter="關於我們"
@@ -119,18 +124,75 @@
 
                 <!-- 食品管理內容 -->
                 <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=食品管理}">
-                    <TextBlock Text="{Binding TotalFoodItems, StringFormat=共 {0} 項食品}" FontSize="16" Foreground="#6B7280" Margin="0,0,0,20"/>
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,20">
+                        <TextBlock Grid.Column="0" Text="{Binding TotalFoodItems, StringFormat=共 {0} 項食品}" FontSize="16" Foreground="#6B7280" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="🔄 重新整理" 
+                               Command="{Binding RefreshDataCommand}"
+                               IsEnabled="{Binding !IsLoading}"
+                               Background="#6B7280" 
+                               Foreground="White" 
+                               Padding="12,6" 
+                               CornerRadius="6"
+                               Margin="0,0,10,0"/>
+                        <Button Grid.Column="2" Content="+ 新增食品" 
+                               Command="{Binding AddFoodItemCommand}"
+                               IsEnabled="{Binding !IsLoading}"
+                               Background="#10B981" 
+                               Foreground="White" 
+                               Padding="12,6" 
+                               CornerRadius="6"/>
+                    </Grid>
                     
-                    <ListBox ItemsSource="{Binding FoodItems}" Background="White" CornerRadius="12" Padding="10">
+                    <!-- 狀態訊息 -->
+                    <Border Background="#F3F4F6" CornerRadius="8" Padding="10" Margin="0,0,0,15" >
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="20" Height="20" CornerRadius="10" Background="#3B82F6" IsVisible="{Binding IsLoading}">
+                                <TextBlock Text="⟳" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"/>
+                            </Border>
+                            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <ListBox ItemsSource="{Binding FoodItems}" 
+                            SelectedItem="{Binding SelectedFoodItem}"
+                            Background="White" 
+                            CornerRadius="12" 
+                            Padding="10">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="White" CornerRadius="8" Padding="15" Margin="0,5">
-                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
-                                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto">
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,0">
+                                                <TextBlock Text="{Binding Category}" FontSize="12" Foreground="#6B7280"/>
+                                                <TextBlock Text="•" FontSize="12" Foreground="#6B7280"/>
+                                                <TextBlock Text="{Binding Location}" FontSize="12" Foreground="#6B7280"/>
+                                            </StackPanel>
+                                        </StackPanel>
                                         <TextBlock Grid.Column="1" Text="{Binding ExpiryDate, StringFormat=yyyy-MM-dd}" VerticalAlignment="Center" Margin="10,0"/>
                                         <TextBlock Grid.Column="2" Text="{Binding Quantity}" VerticalAlignment="Center" Margin="10,0"/>
-                                        <TextBlock Grid.Column="3" Text="{Binding Status}" VerticalAlignment="Center" Margin="10,0"/>
-                                        <Button Grid.Column="4" Content="編輯" Background="#3B82F6" Foreground="White" Padding="8,4" CornerRadius="4"/>
+                                        <Border Grid.Column="3" Background="{Binding StatusColor}" CornerRadius="12" Padding="8,4" Margin="10,0">
+                                            <TextBlock Text="{Binding Status}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <Button Grid.Column="4" Content="編輯" 
+                                               Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).EditFoodItemCommand}"
+                                               CommandParameter="{Binding}"
+                                               IsEnabled="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).IsLoading, Converter={x:Static vm:NotConverter.Instance}}"
+                                               Background="#3B82F6" 
+                                               Foreground="White" 
+                                               Padding="8,4" 
+                                               CornerRadius="4" 
+                                               Margin="5,0"/>
+                                        <Button Grid.Column="5" Content="刪除" 
+                                               Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).DeleteFoodItemCommand}"
+                                               CommandParameter="{Binding}"
+                                               IsEnabled="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).IsLoading, Converter={x:Static vm:NotConverter.Instance}}"
+                                               Background="#EF4444" 
+                                               Foreground="White" 
+                                               Padding="8,4" 
+                                               CornerRadius="4" 
+                                               Margin="5,0"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -140,17 +202,75 @@
 
                 <!-- 訂閱管理內容 -->
                 <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=訂閱管理}">
-                    <TextBlock Text="{Binding MonthlyTotal, StringFormat=總計 NT$ {0:N0}}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6" Margin="0,0,0,20"/>
+                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,20">
+                        <TextBlock Grid.Column="0" Text="{Binding MonthlyTotal, StringFormat=總計 NT$ {0:N0}}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="🔄 重新整理" 
+                               Command="{Binding RefreshDataCommand}"
+                               IsEnabled="{Binding !IsLoading}"
+                               Background="#6B7280" 
+                               Foreground="White" 
+                               Padding="12,6" 
+                               CornerRadius="6"
+                               Margin="0,0,10,0"/>
+                        <Button Grid.Column="2" Content="+ 新增訂閱" 
+                               Command="{Binding AddSubscriptionCommand}"
+                               IsEnabled="{Binding !IsLoading}"
+                               Background="#10B981" 
+                               Foreground="White" 
+                               Padding="12,6" 
+                               CornerRadius="6"/>
+                    </Grid>
                     
-                    <ListBox ItemsSource="{Binding Subscriptions}" Background="White" CornerRadius="12" Padding="10">
+                    <!-- 狀態訊息 -->
+                    <Border Background="#F3F4F6" CornerRadius="8" Padding="10" Margin="0,0,0,15" >
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="20" Height="20" CornerRadius="10" Background="#3B82F6" IsVisible="{Binding IsLoading}">
+                                <TextBlock Text="⟳" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"/>
+                            </Border>
+                            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <ListBox ItemsSource="{Binding Subscriptions}" 
+                            SelectedItem="{Binding SelectedSubscription}"
+                            Background="White" 
+                            CornerRadius="12" 
+                            Padding="10">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="White" CornerRadius="8" Padding="15" Margin="0,5">
-                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-                                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto">
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,5,0,0">
+                                                <TextBlock Text="{Binding Category}" FontSize="12" Foreground="#6B7280"/>
+                                                <TextBlock Text="•" FontSize="12" Foreground="#6B7280"/>
+                                                <TextBlock Text="{Binding PaymentMethod}" FontSize="12" Foreground="#6B7280"/>
+                                            </StackPanel>
+                                        </StackPanel>
                                         <TextBlock Grid.Column="1" Text="{Binding NextPaymentDate, StringFormat=yyyy-MM-dd}" VerticalAlignment="Center" Margin="10,0"/>
                                         <TextBlock Grid.Column="2" Text="{Binding Amount, StringFormat=NT$ {0}}" VerticalAlignment="Center" Margin="10,0"/>
-                                        <TextBlock Grid.Column="3" Text="{Binding Status}" VerticalAlignment="Center" Margin="10,0"/>
+                                        <Border Grid.Column="3" Background="{Binding StatusColor}" CornerRadius="12" Padding="8,4" Margin="10,0">
+                                            <TextBlock Text="{Binding Status}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <Button Grid.Column="4" Content="編輯" 
+                                               Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).EditSubscriptionCommand}"
+                                               CommandParameter="{Binding}"
+                                               IsEnabled="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).IsLoading, Converter={x:Static vm:NotConverter.Instance}}"
+                                               Background="#3B82F6" 
+                                               Foreground="White" 
+                                               Padding="8,4" 
+                                               CornerRadius="4" 
+                                               Margin="5,0"/>
+                                        <Button Grid.Column="5" Content="刪除" 
+                                               Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).DeleteSubscriptionCommand}"
+                                               CommandParameter="{Binding}"
+                                               IsEnabled="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).IsLoading, Converter={x:Static vm:NotConverter.Instance}}"
+                                               Background="#EF4444" 
+                                               Foreground="White" 
+                                               Padding="8,4" 
+                                               CornerRadius="4" 
+                                               Margin="5,0"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -198,6 +318,129 @@
                             <TextBlock Text="選擇一首歌曲" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
+                </StackPanel>
+
+                <!-- 系統設定內容 -->
+                <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=系統設定}">
+                    <TextBlock Text="配置系統參數和連接設定" FontSize="14" Foreground="#6B7280" Margin="0,0,0,30"/>
+                    
+                    <ScrollViewer MaxHeight="600">
+                        <StackPanel Spacing="20">
+                            <!-- nhost 設定區塊 -->
+                            <Border Background="White" CornerRadius="12" Padding="25">
+                                <StackPanel Spacing="15">
+                                    <TextBlock Text="🔗 nhost 連接設定" FontSize="18" FontWeight="Bold" Foreground="#1F2937"/>
+                                    
+                                    <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto" Margin="0,10,0,0">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Subdomain:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" 
+                                                Text="{Binding SystemSettings.NhostSubdomain}" 
+                                                Watermark="輸入 nhost subdomain"
+                                                Margin="10,0,0,0"/>
+                                        
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Admin Secret:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" 
+                                                Text="{Binding SystemSettings.NhostAdminSecret}" 
+                                                Watermark="輸入 admin secret"
+                                                PasswordChar="*"
+                                                Margin="10,15,0,0"/>
+                                    </Grid>
+                                    
+                                    <Border Background="#EFF6FF" CornerRadius="8" Padding="15" Margin="0,10,0,0">
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <TextBlock Text="ℹ️" FontSize="16" VerticalAlignment="Top"/>
+                                            <StackPanel>
+                                                <TextBlock Text="nhost 連接資訊" FontWeight="SemiBold" Foreground="#1E40AF"/>
+                                                <TextBlock Text="這些設定用於連接到 nhost 後端服務，請確保資訊正確。" 
+                                                         FontSize="12" Foreground="#374151" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                    
+                                    <!-- 連接測試區域 -->
+                                    <StackPanel Orientation="Horizontal" Spacing="15" Margin="0,15,0,0">
+                                        <Button Content="測試連接" 
+                                               Command="{Binding TestNhostConnectionCommand}"
+                                               IsEnabled="{Binding !IsTestingConnection}"
+                                               Background="#3B82F6" 
+                                               Foreground="White" 
+                                               Padding="12,6" 
+                                               CornerRadius="6"/>
+                                        <Button Content="重新連接 API" 
+                                               Command="{Binding ReconnectApiCommand}"
+                                               Background="#8B5CF6" 
+                                               Foreground="White" 
+                                               Padding="12,6" 
+                                               CornerRadius="6"/>
+                                        <TextBlock Text="{Binding ConnectionTestResult}" 
+                                                  VerticalAlignment="Center" 
+                                                  FontSize="14"
+                                                  TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 應用程式設定區塊 -->
+                            <Border Background="White" CornerRadius="12" Padding="25">
+                                <StackPanel Spacing="15">
+                                    <TextBlock Text="🎨 應用程式設定" FontSize="18" FontWeight="Bold" Foreground="#1F2937"/>
+                                    
+                                    <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,10,0,0">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="主題:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" 
+                                                 SelectedItem="{Binding SystemSettings.Theme}"
+                                                 Margin="10,0,0,0">
+                                            <ComboBoxItem Content="Default"/>
+                                            <ComboBoxItem Content="Light"/>
+                                            <ComboBoxItem Content="Dark"/>
+                                        </ComboBox>
+                                        
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="語言:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="1" 
+                                                 SelectedItem="{Binding SystemSettings.Language}"
+                                                 Margin="10,15,0,0">
+                                            <ComboBoxItem Content="繁體中文"/>
+                                            <ComboBoxItem Content="简体中文"/>
+                                            <ComboBoxItem Content="English"/>
+                                        </ComboBox>
+                                        
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="通知:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                                        <CheckBox Grid.Row="2" Grid.Column="1" 
+                                                 IsChecked="{Binding SystemSettings.EnableNotifications}"
+                                                 Content="啟用系統通知"
+                                                 Margin="10,15,0,0"/>
+                                        
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="自動儲存:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                                        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="10,15,0,0">
+                                            <CheckBox IsChecked="{Binding SystemSettings.AutoSave}" Content="啟用自動儲存" Margin="0,0,20,0"/>
+                                            <TextBlock Text="間隔:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                            <NumericUpDown Value="{Binding SystemSettings.AutoSaveInterval}" 
+                                                          Minimum="1" Maximum="60" Width="80"/>
+                                            <TextBlock Text="分鐘" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 操作按鈕 -->
+                            <Border Background="White" CornerRadius="12" Padding="25">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="15">
+                                    <Button Content="重設為預設值" 
+                                           Command="{Binding ResetSettingsCommand}"
+                                           Background="#6B7280" 
+                                           Foreground="White" 
+                                           Padding="15,8" 
+                                           CornerRadius="6"/>
+                                    <Button Content="儲存設定" 
+                                           Command="{Binding SaveSettingsCommand}"
+                                           Background="#10B981" 
+                                           Foreground="White" 
+                                           Padding="15,8" 
+                                           CornerRadius="6"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
                 </StackPanel>
 
                 <StackPanel IsVisible="{Binding SelectedMenuItem, Converter={x:Static vm:StringEqualsConverter.Instance}, ConverterParameter=關於我們}">

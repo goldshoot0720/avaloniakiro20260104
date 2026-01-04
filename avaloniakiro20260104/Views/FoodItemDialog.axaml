@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:avaloniakiro20260104.ViewModels"
+        x:Class="avaloniakiro20260104.Views.FoodItemDialog"
+        Title="食品項目"
+        Width="500" Height="600"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Border Background="#F8FAFC" Padding="20">
+        <StackPanel Spacing="15">
+            <TextBlock Text="食品項目資訊" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+            
+            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,20,0,0">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="名稱:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Name="NameTextBox" Watermark="輸入食品名稱" Margin="10,0,0,0"/>
+                
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="數量:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <NumericUpDown Grid.Row="1" Grid.Column="1" Name="QuantityNumeric" Minimum="1" Value="1" Margin="10,15,0,0"/>
+                
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="到期日:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <DatePicker Grid.Row="2" Grid.Column="1" Name="ExpiryDatePicker" Margin="10,15,0,0"/>
+                
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="購買日:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <DatePicker Grid.Row="3" Grid.Column="1" Name="PurchaseDatePicker" Margin="10,15,0,0"/>
+                
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="分類:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <ComboBox Grid.Row="4" Grid.Column="1" Name="CategoryComboBox" Margin="10,15,0,0">
+                    <ComboBoxItem Content="蔬菜"/>
+                    <ComboBoxItem Content="水果"/>
+                    <ComboBoxItem Content="肉類"/>
+                    <ComboBoxItem Content="海鮮"/>
+                    <ComboBoxItem Content="乳製品"/>
+                    <ComboBoxItem Content="冷凍食品"/>
+                    <ComboBoxItem Content="罐頭"/>
+                    <ComboBoxItem Content="零食"/>
+                    <ComboBoxItem Content="飲料"/>
+                    <ComboBoxItem Content="其他"/>
+                </ComboBox>
+                
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="存放位置:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <ComboBox Grid.Row="5" Grid.Column="1" Name="LocationComboBox" Margin="10,15,0,0">
+                    <ComboBoxItem Content="冰箱"/>
+                    <ComboBoxItem Content="冷凍庫"/>
+                    <ComboBoxItem Content="櫥櫃"/>
+                    <ComboBoxItem Content="儲藏室"/>
+                    <ComboBoxItem Content="其他"/>
+                </ComboBox>
+                
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="備註:" VerticalAlignment="Top" FontWeight="SemiBold" Margin="0,15,0,0"/>
+                <TextBox Grid.Row="6" Grid.Column="1" Name="NotesTextBox" 
+                        AcceptsReturn="True" 
+                        Height="80" 
+                        TextWrapping="Wrap" 
+                        Watermark="輸入備註資訊" 
+                        Margin="10,15,0,0"/>
+            </Grid>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,30,0,0">
+                <Button Name="CancelButton" Content="取消" Padding="15,8" Background="#6B7280" Foreground="White" CornerRadius="6"/>
+                <Button Name="SaveButton" Content="儲存" Padding="15,8" Background="#10B981" Foreground="White" CornerRadius="6"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
