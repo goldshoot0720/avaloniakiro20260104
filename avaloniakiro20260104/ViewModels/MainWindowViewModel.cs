@@ -415,6 +415,13 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (foodItem == null) return;
 
+        // 顯示確認對話框
+        var confirmDialog = new Views.ConfirmationDialog($"確定要刪除食品項目「{foodItem.Name}」嗎？");
+        var mainWindow = (App.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        var confirmed = await confirmDialog.ShowDialog<bool>(mainWindow!);
+        
+        if (!confirmed) return;
+
         IsLoading = true;
         StatusMessage = "刪除食品中...";
 
@@ -564,6 +571,13 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task DeleteSubscription(Subscription? subscription)
     {
         if (subscription == null) return;
+
+        // 顯示確認對話框
+        var confirmDialog = new Views.ConfirmationDialog($"確定要刪除訂閱項目「{subscription.Name}」嗎？");
+        var mainWindow = (App.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        var confirmed = await confirmDialog.ShowDialog<bool>(mainWindow!);
+        
+        if (!confirmed) return;
 
         IsLoading = true;
         StatusMessage = "刪除訂閱中...";

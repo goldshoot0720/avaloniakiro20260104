@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="avaloniakiro20260104.Views.ConfirmationDialog"
+        Title="確認"
+        Width="400"
+        Height="200"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Grid.Row="0" VerticalAlignment="Center">
+            <TextBlock x:Name="MessageTextBlock" 
+                       Text="確定要執行此操作嗎？"
+                       FontSize="16"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="1" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center"
+                    Spacing="10"
+                    Margin="0,20,0,0">
+            <Button Name="ConfirmButton" 
+                    Content="確定" 
+                    Width="80"
+                    Height="35"
+                    Classes="accent"/>
+            <Button Name="CancelButton" 
+                    Content="取消" 
+                    Width="80"
+                    Height="35"/>
+        </StackPanel>
+    </Grid>
+</Window>
